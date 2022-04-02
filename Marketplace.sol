@@ -44,4 +44,26 @@ contract ArtMarketplace {
         _;
     }
 
+    function putItemForSale(uint256 tokenId, uint256 price)
+    OnlyItemOwner(tokenId)
+    HasTransferApproval(tokenId)
+    external
+    returns (uint256){
+        require(!activeItems[tokenId], "Item is already up for sale");
+
+        uint256 newItemId = itemsForSale.length;
+        itemsForSale.push(ItemForSale({
+        id: newItemId,
+        tokenId: tokenId,
+        seller: payable(msg.sender),
+        price: price,
+        isSold: false
+        }));
+        activeItems[tokenId] = true;
+
+        assert(itemsForSale[newItemId].id == newItemId);
+        emit itemAddedForSale(newItemId, tokenId, price);
+        return newItemId;
+    }
+
 }
